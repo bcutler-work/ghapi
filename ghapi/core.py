@@ -200,8 +200,8 @@ class AsyncGhApi(_GhObj):
         if not path.startswith(('http://', 'https://')):
             path = self.gh_host + path
         if route:
-            # what is this even for?
             for k, v in route.items(): route[k] = quote(str(route[k]))
+            path = path.format(**route)
 
         async with self.session.request(verb, path, headers=headers or None, params=query or None, data=data or None) as response:
             if 'X-RateLimit-Remaining' in response.raw_headers:

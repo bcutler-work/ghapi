@@ -16,6 +16,7 @@ from urllib.parse import quote
 from datetime import datetime,timedelta
 from pprint import pprint
 import os
+import json
 
 import aiohttp
 
@@ -202,12 +203,14 @@ class AsyncGhApi(_GhObj):
         if route:
             for k, v in route.items(): route[k] = quote(str(route[k]))
             path = path.format(**route)
+        if not isinstance(data, (str, bytes)):
+            data = json.dumps(data)
 
         async with self.session.request(verb, path, headers=headers or None, params=query or None, data=data or None) as response:
-            if 'X-RateLimit-Remaining' in response.raw_headers:
-                newlim = response.raw_headers['X-RateLimit-Remaining']
+            if 'X-RateLimit-Remaining' in response.headers:
+                newlim = response.headers['X-RateLimit-Remaining']
                 if self.limit_cb is not None and newlim != self.limit_rem:
-                    await self.limit_cb(int(newlim), int(response.raw_headers['X-RateLimit-Limit']))
+                    await self.limit_cb(int(newlim), int(response.headers['X-RateLimit-Limit']))
                 self.limit_rem = newlim
             return dict2obj(await response.json())
 

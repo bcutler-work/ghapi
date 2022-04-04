@@ -1,3 +1,7 @@
+# This fork is experimental
+
+Adds `AsyncGhApi` that uses aiohttp under the hood so that you can `await` calls. That's it for now.
+
 # ghapi
 > A delightful and complete interface to GitHub's amazing API
 
